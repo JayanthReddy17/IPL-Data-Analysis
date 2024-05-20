@@ -1,0 +1,113 @@
+library(tidyverse) ## wrangle the data
+library(lubridate) ## wrangle the data attributes 
+library(ggplot2) ## data visualization
+library(tidyr) ## tidy data 
+library(dplyr)
+
+head(deliveries)
+
+head(matches)
+
+class(matches)
+str(matches)
+colnames(matches)
+summary(matches)
+
+class(deliveries)
+str(deliveries)
+colnames(deliveries)
+summary(deliveries)
+count(matches)
+
+matches %>% 
+    group_by(winner) %>%
+    summarize(wins = n() , .groups = 'drop')
+
+matches %>% 
+    group_by(winner) %>%
+    summarize(wins = n(), .groups= 'drop') %>%
+    ggplot(aes(x=wins, y=winner, fill=winner)) + geom_col(position="dodge") + 
+    labs(x="Number of Wins", y="Team", title = "Number  of Matches by Team")
+
+matches %>% 
+    group_by(player_of_match) %>%
+    summarize(awards = n())
+
+matches %>% 
+    group_by(player_of_match) %>%
+    summarize(awards = n()) %>%
+    top_n(10)
+
+matches %>% 
+    group_by(player_of_match) %>%
+    summarize(awards = n()) %>% 
+    top_n(10) %>%
+    ggplot(aes(x = player_of_match, y=awards, fill=player_of_match)) + geom_col(position="dodge") +
+    labs(x="Player_of_match", y = "Awards" , title = "Top 10 Player Man of the Match") + coord_flip()
+
+matches$day <- format(as.Date(matches$date), "%d")
+matches$month <- format(as.Date(matches$date), "%m")
+matches$year <- format(as.Date(matches$date), "%Y")
+
+season_count <- length(unique(matches$year))
+season_count
+
+runs <- matches[which.max(!is.na(matches$result)),] 
+runs %>% select('winner', 'result', 'team1', 'team2') %>% filter(result == "runs")
+A data.frame: 1 × 4
+
+runs <- matches %>% filter(result == "runs") %>%
+    select('winner', 'result' )
+runs
+count(runs)
+
+wickets <- matches %>% filter(result == "wickets") %>%
+    select('winner', 'result')
+wickets
+count(wickets)
+matches %>% 
+    group_by(year) %>%
+    summarize(number_of_matches = n())
+
+matches %>% 
+    group_by(year) %>%
+    summarize(number_of_matches=n(),.groups='drop') %>%
+    ggplot(aes(x=year, y= number_of_matches, fill=year)) + geom_bar(stat = "identity") +
+    labs(x="Season",y="Number ff Matches", title ="Season wise number of matches")
+
+matches %>% 
+    filter(result != 'No result') %>%
+    group_by(winner,city) %>%
+    summarize(wins = n(),.groups='drop') %>%
+    arrange(desc(wins)) %>%
+    top_n(10)
+
+matches %>% 
+    filter(result != 'No result') %>%
+    group_by(winner,city) %>%
+    summarize(wins = n(), .groups='drop') %>%
+    arrange(city)
+
+head(deliveries)
+
+deliveries %>% 
+    group_by(bowler) %>%
+    summarize(total_runs = sum(total_runs)) %>%
+    arrange(total_runs)
+
+head(matches)
+
+head(deliveries)
+
+data <- bind_rows(matches,deliveries)
+
+head(data)
+
+power_play <- data %>%
+    group_by(over < 6)
+
+head(power_play)
+
+colnames(data)
+
+is.na(power_play$batsman_runs)
